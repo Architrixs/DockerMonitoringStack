@@ -1,0 +1,42 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+rule_files:
+  - /etc/prometheus/alert.rules.yml
+
+scrape_configs:
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+      # --- HOW TO ADD A REMOTE HOST ---
+      # 1. Install Node Exporter on the remote machine (e.g., 192.168.1.101).
+      #    You can use the official binary or a Docker container.
+      #    docker run -d --net="host" --pid="host" -v "/:/host:ro,rslave" prom/node-exporter
+      # 2. Uncomment the line below and replace the IP address.
+      # - targets: ['192.168.1.101:9100']
+
+  # --- OPTIONAL GPU MONITORING ---
+  # Uncomment the job below if you enabled the dcgm-exporter service.
+  - job_name: 'dcgm-exporter'
+    static_configs:
+      - targets: ['dcgm-exporter:9400']
+
+  - job_name: "alertmanager"
+    static_configs:
+      - targets: ["alertmanager:9093"]
+
+  - job_name: 'docker-state'
+    static_configs:
+      - targets: ['docker-state-exporter:8080']  # or use host IP if needed
+    scrape_interval: 10s

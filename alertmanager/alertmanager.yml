@@ -1,0 +1,51 @@
+global:
+  # --- SMTP Server Settings ---
+  smtp_from: '${SMTP_USERNAME}'
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_auth_username: '${SMTP_USERNAME}'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+  smtp_require_tls: true
+
+# This block tells AlertManager where to find our new template file.
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+route:
+  # This is a dummy receiver. The main logic is in the 'routes' below.
+  receiver: 'blackhole'
+  group_by: ['alertname', 'job']
+  
+  # These timing settings are crucial and apply to all alerts.
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 1h
+  
+  # This section defines a list of routes that are evaluated in order.
+  routes:
+    # Route 1: Send ALL alerts to email.
+    # 'continue: true' is critical. It tells AlertManager to continue
+    # processing the next route even after this one has matched.
+    - receiver: 'email-notifications'
+      continue: true
+
+    # Route 2: Send ALL alerts to the webhook.
+    # Since there's no 'match' clause, this also matches every alert.
+    - receiver: 'app-api-webhook'
+
+receivers:
+  # A blackhole receiver that does nothing. Used as a safe default.
+  - name: 'blackhole'
+
+  - name: 'email-notifications'
+    email_configs:
+      - to: 'your-recipient-email@example.com'
+        headers:
+          subject: '[{{ .Status | toUpper }}] {{ .CommonAnnotations.summary }}'
+        html: '{{ template "custom_email.html" . }}'
+        send_resolved: true
+
+  # --- Webhook Receiver ---
+  - name: 'app-api-webhook'
+    webhook_configs:
+      - url: 'https://your-api-endpoint/alert'
+        send_resolved: true

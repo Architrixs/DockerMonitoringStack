@@ -1,0 +1,74 @@
+# docker-compose.remote.yml
+# This file should be placed on each remote node you want to monitor.
+# It only contains the necessary exporter services.
+#
+# To run:
+# docker-compose -f docker-compose.remote.yml up -d
+
+version: '3.8'
+
+services:
+  # This service allows the main Portainer instance to connect to this node.
+  portainer-agent:
+    image: portainer/agent:2.33.0-alpine
+    container_name: portainer-agent
+    restart: unless-stopped
+    ports:
+      # Exposes the agent on port 9001 for the main Portainer server to connect to.
+      - "9001:9001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+  # cAdvisor - Container metrics exporter
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.52.0
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/lib/docker/overlay2:/var/lib/docker/overlay2:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    ports:
+      - "8080:8080"
+
+  # Node Exporter - Host system metrics exporter
+  node-exporter:
+    image: prom/node-exporter:v1.8.1
+    container_name: node-exporter
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - "9100:9100"
+
+  # --- OPTIONAL GPU MONITORING ---
+  # uncomment the service below if the remote node has NVIDIA GPUs
+  # and the NVIDIA Container Toolkit installed.
+  #
+  # dcgm-exporter:
+  #   image: nvidia/dcgm-exporter:4.2.3-4.1.3-ubuntu22.04
+  #   container_name: dcgm-exporter
+  #   restart: unless-stopped
+  #   privileged: true
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
+  #   ports:
+  #     - "9400:9400"
