@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafana Dashboard Embedding Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .controls label {
+            font-weight: bold;
+        }
+        .controls button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .controls button:hover {
+            background-color: #0056b3;
+        }
+        iframe {
+            width: 100%;
+            height: 800px; /* Default height, can be adjusted */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Embedded Grafana Dashboard</h1>
+        
+        <!-- Controls to change the theme -->
+        <div class="controls">
+            <div class="control-group">
+                <label>Theme:</label>
+                <input type="radio" id="theme-light" name="theme" value="light" onchange="updateDashboardTheme()">
+                <label for="theme-light">Light</label>
+                <input type="radio" id="theme-dark" name="theme" value="dark" checked onchange="updateDashboardTheme()">
+                <label for="theme-dark">Dark</label>
+            </div>
+        </div>
+
+        <!-- The iFrame where the Grafana dashboard will be displayed -->
+        <iframe 
+          id="grafana-dashboard-iframe"
+          src="http://192.168.5.100:3000/d/all-in-one-host-dashboard11/simplified-host-dashboardv11?orgId=1&refresh=10s&theme=dark&kiosk"
+          frameborder="0">
+        </iframe>
+    </div>
+
+    <script>
+        // This JavaScript function updates the iFrame's theme.
+        function updateDashboardTheme() {
+            // 1. Get the selected theme.
+            const selectedTheme = document.querySelector('input[name="theme"]:checked').value;
+
+            // 2. Get the iFrame element.
+            const iframe = document.getElementById('grafana-dashboard-iframe');
+            
+            // 3. Get the current URL from the iFrame.
+            const currentUrl = new URL(iframe.src);
+
+            // 4. Update the 'theme' parameter in the URL.
+            currentUrl.searchParams.set('theme', selectedTheme);
+
+            // 5. Update the iFrame's 'src' attribute to reload it with the new theme.
+            console.log("Updating dashboard theme to:", selectedTheme);
+            iframe.src = currentUrl.toString();
+        }
+    </script>
+
+</body>
+</html>

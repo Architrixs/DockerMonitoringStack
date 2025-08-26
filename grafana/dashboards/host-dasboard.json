@@ -47,7 +47,7 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 4,
+        "w": 3,
         "x": 0,
         "y": 0
       },
@@ -116,7 +116,7 @@
       "gridPos": {
         "h": 3,
         "w": 3,
-        "x": 4,
+        "x": 3,
         "y": 0
       },
       "id": 416,
@@ -177,8 +177,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 3,
-        "x": 7,
+        "w": 2,
+        "x": 6,
         "y": 0
       },
       "id": 404,
@@ -266,7 +266,7 @@
       "gridPos": {
         "h": 3,
         "w": 4,
-        "x": 10,
+        "x": 8,
         "y": 0
       },
       "id": 412,
@@ -365,7 +365,7 @@
       "gridPos": {
         "h": 3,
         "w": 4,
-        "x": 14,
+        "x": 12,
         "y": 0
       },
       "id": 414,
@@ -446,8 +446,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 5,
-        "x": 18,
+        "w": 3,
+        "x": 16,
         "y": 0
       },
       "id": 206,
@@ -481,6 +481,76 @@
         }
       ],
       "title": "GPU Temperature",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 5,
+        "x": 19,
+        "y": 0
+      },
+      "id": 417,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "DCGM_FI_DEV_GPU_UTIL{job=\"dcgm-exporter-remote\", instance=~\"$host:.*\"}",
+          "instant": true,
+          "legendFormat": "{{device}}: {{modelName}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "GPU model",
       "type": "stat"
     },
     {
@@ -644,7 +714,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 7,
+        "w": 8,
         "x": 9,
         "y": 3
       },
@@ -738,7 +808,7 @@
       "gridPos": {
         "h": 8,
         "w": 7,
-        "x": 16,
+        "x": 17,
         "y": 3
       },
       "id": 202,
@@ -905,7 +975,7 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 23,
+        "w": 14,
         "x": 0,
         "y": 12
       },
@@ -1115,10 +1185,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 21
+        "h": 9,
+        "w": 10,
+        "x": 14,
+        "y": 12
       },
       "id": 106,
       "options": {
@@ -1164,13 +1234,9 @@
     "list": [
       {
         "current": {
-          "selected": true,
-          "text": [
-            "192.168.7.20"
-          ],
-          "value": [
-            "192.168.7.20"
-          ]
+          "selected": false,
+          "text": "192.168.2.24",
+          "value": "192.168.2.24"
         },
         "datasource": {
           "type": "prometheus",
@@ -1178,8 +1244,8 @@
         },
         "definition": "label_values(up, instance)",
         "hide": 0,
-        "includeAll": true,
-        "multi": true,
+        "includeAll": false,
+        "multi": false,
         "name": "host",
         "options": [],
         "query": "label_values(up, instance)",
@@ -1199,6 +1265,6 @@
   "timezone": "",
   "title": "Simplified Host Dashboard",
   "uid": "all-in-one-host-dashboard",
-  "version": 6,
+  "version": 1,
   "weekStart": ""
 }
