@@ -115,3 +115,4 @@ Use these in the Grafana "Explore" tab or the Prometheus UI to query your data.
 To stop and remove all containers:
 ```sh
 docker-compose down
+```

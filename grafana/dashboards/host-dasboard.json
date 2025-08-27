@@ -18,9 +18,8 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 62,
+  "id": 81,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
       "datasource": {
@@ -38,7 +37,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           }
@@ -69,7 +68,7 @@
         "textMode": "name",
         "wideLayout": true
       },
-      "pluginVersion": "11.1.0",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -78,7 +77,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "node_os_info{instance=~\"$host:.*\"}",
+          "expr": "node_os_info{servername=\"$host\"}",
           "format": "time_series",
           "instant": false,
           "legendFormat": "{{pretty_name}}",
@@ -105,7 +104,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -137,14 +136,14 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.1.0",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "time() - node_boot_time_seconds{instance=~\"$host:.*\"}",
+          "expr": "time() - node_boot_time_seconds{servername=\"$host\"}",
           "legendFormat": "",
           "refId": "A"
         }
@@ -168,7 +167,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           }
@@ -199,14 +198,14 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.1.0",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "count(node_cpu_seconds_total{instance=~\"$host:.*\", mode='system'})",
+          "expr": "count(node_cpu_seconds_total{servername=\"$host\", mode='system'})",
           "legendFormat": "",
           "refId": "A"
         }
@@ -230,7 +229,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -287,14 +286,14 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.1.0",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(node_memory_MemTotal_bytes{instance=~\"$host:.*\"} - node_memory_MemAvailable_bytes{instance=~\"$host:.*\"})",
+          "expr": "sum(node_memory_MemTotal_bytes{servername=\"$host\"} - node_memory_MemAvailable_bytes{servername=\"$host\"})",
           "instant": true,
           "legendFormat": "Used",
           "refId": "A"
@@ -304,7 +303,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(node_memory_MemTotal_bytes{instance=~\"$host:.*\"})",
+          "expr": "sum(node_memory_MemTotal_bytes{servername=\"$host\"})",
           "instant": true,
           "legendFormat": "Total",
           "refId": "B"
@@ -329,7 +328,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -386,14 +385,14 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.1.0",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(node_filesystem_size_bytes{instance=~\"$host:.*\", fstype!~\"tmpfs|squashfs\"}) - sum(node_filesystem_free_bytes{instance=~\"$host:.*\", fstype!~\"tmpfs|squashfs\"})",
+          "expr": "sum(node_filesystem_size_bytes{servername=\"$host\", fstype!~\"tmpfs|squashfs\"}) - sum(node_filesystem_free_bytes{servername=\"$host\", fstype!~\"tmpfs|squashfs\"})",
           "instant": true,
           "legendFormat": "Used",
           "refId": "A"
@@ -403,7 +402,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(node_filesystem_size_bytes{instance=~\"$host:.*\", fstype!~\"tmpfs|squashfs\"})",
+          "expr": "sum(node_filesystem_size_bytes{servername=\"$host\", fstype!~\"tmpfs|squashfs\"})",
           "instant": true,
           "legendFormat": "Total",
           "refId": "B"
@@ -428,7 +427,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "orange",
@@ -468,14 +467,14 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.1.0",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "DCGM_FI_DEV_GPU_TEMP{job=\"dcgm-exporter-remote\", instance=~\"$host:.*\"}",
+          "expr": "DCGM_FI_DEV_GPU_TEMP{job=\"dcgm-exporter-remote\", servername=\"$host\"}",
           "legendFormat": "GPU {{gpu}}",
           "refId": "A"
         }
@@ -499,7 +498,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -534,7 +533,7 @@
         "textMode": "name",
         "wideLayout": true
       },
-      "pluginVersion": "11.1.0",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -543,7 +542,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "DCGM_FI_DEV_GPU_UTIL{job=\"dcgm-exporter-remote\", instance=~\"$host:.*\"}",
+          "expr": "DCGM_FI_DEV_GPU_UTIL{job=\"dcgm-exporter-remote\", servername=\"$host\"}",
           "instant": true,
           "legendFormat": "{{device}}: {{modelName}}",
           "range": false,
@@ -570,6 +569,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "opacity",
@@ -601,7 +601,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "orange",
@@ -632,10 +632,12 @@
           "showLegend": false
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -643,7 +645,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\", instance=~\"$host:.*\"}[5m])) * 100)",
+          "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\", servername=\"$host\"}[5m])) * 100)",
           "legendFormat": "CPU Usage",
           "range": true,
           "refId": "A"
@@ -669,6 +671,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "opacity",
@@ -700,7 +703,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -727,17 +730,19 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "100 * (DCGM_FI_DEV_FB_USED{job=\"dcgm-exporter-remote\", instance=~\"$host:.*\"} / (DCGM_FI_DEV_FB_USED{job=\"dcgm-exporter-remote\", instance=~\"$host:.*\"} + DCGM_FI_DEV_FB_FREE{job=\"dcgm-exporter-remote\", instance=~\"$host:.*\"}))",
+          "expr": "100 * (DCGM_FI_DEV_FB_USED{job=\"dcgm-exporter-remote\", servername=\"$host\"} / (DCGM_FI_DEV_FB_USED{job=\"dcgm-exporter-remote\", servername=\"$host\"} + DCGM_FI_DEV_FB_FREE{job=\"dcgm-exporter-remote\", servername=\"$host\"}))",
           "legendFormat": "GPU {{gpu}}",
           "refId": "A"
         }
@@ -762,6 +767,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "opacity",
@@ -793,7 +799,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -820,17 +826,19 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "DCGM_FI_DEV_GPU_UTIL{job=\"dcgm-exporter-remote\", instance=~\"$host:.*\"}",
+          "expr": "DCGM_FI_DEV_GPU_UTIL{job=\"dcgm-exporter-remote\", servername=\"$host\"}",
           "legendFormat": "GPU {{gpu}}",
           "refId": "A"
         }
@@ -871,7 +879,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "#EAB839",
@@ -914,7 +922,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     },
                     {
                       "color": "#EAB839",
@@ -998,7 +1006,7 @@
           }
         ]
       },
-      "pluginVersion": "11.1.0",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -1007,7 +1015,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{instance=~\"$host:.*\",name!=\"\"}[1m]))",
+          "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{servername=\"$host\",name!=\"\"}[1m]))",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1020,7 +1028,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(container_memory_usage_bytes{instance=~\"$host:.*\", name!=\"\"}) by (name)",
+          "expr": "sum(container_memory_usage_bytes{servername=\"$host\", name!=\"\"}) by (name)",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1031,7 +1039,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum by (name) (rate(container_network_receive_bytes_total{instance=~\"$host:.*\", name!=\"\"}[1m]))",
+          "expr": "sum by (name) (rate(container_network_receive_bytes_total{servername=\"$host\", name!=\"\"}[1m]))",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1042,7 +1050,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum by (name) (rate(container_network_transmit_bytes_total{instance=~\"$host:.*\", name!=\"\"}[1m]))",
+          "expr": "sum by (name) (rate(container_network_transmit_bytes_total{servername=\"$host\", name!=\"\"}[1m]))",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1053,7 +1061,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "time() - avg(container_start_time_seconds{instance=~\"$host:.*\", name!=\"\"}) by (name)",
+          "expr": "time() - avg(container_start_time_seconds{servername=\"$host\", name!=\"\"}) by (name)",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1141,6 +1149,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
@@ -1172,7 +1181,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -1199,17 +1208,19 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "rate(node_disk_read_bytes_total{instance=~\"$host:.*\"}[5m])",
+          "expr": "rate(node_disk_read_bytes_total{servername=\"$host\"}[5m])",
           "legendFormat": "Read - {{device}}",
           "refId": "A"
         },
@@ -1218,7 +1229,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "rate(node_disk_written_bytes_total{instance=~\"$host:.*\"}[5m])",
+          "expr": "rate(node_disk_written_bytes_total{servername=\"$host\"}[5m])",
           "legendFormat": "Write - {{device}}",
           "refId": "B"
         }
@@ -1227,31 +1238,32 @@
       "type": "timeseries"
     }
   ],
+  "preload": false,
   "refresh": "10s",
-  "schemaVersion": 39,
+  "schemaVersion": 41,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
-          "text": "192.168.2.24",
-          "value": "192.168.2.24"
+          "text": "i2v-Sagar (192.168.7.199)",
+          "value": "i2v-Sagar (192.168.7.199)"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "PBFA97CFB590B2093"
         },
-        "definition": "label_values(up, instance)",
-        "hide": 0,
+        "definition": "query_result(count_over_time(up[5m]) > 0)",
         "includeAll": false,
-        "multi": false,
         "name": "host",
         "options": [],
-        "query": "label_values(up, instance)",
-        "refresh": 1,
-        "regex": "/([^:]+).*/",
-        "skipUrlSync": false,
+        "query": {
+          "qryType": 3,
+          "query": "query_result(count_over_time(up[5m]) > 0)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 2,
+        "regex": "/servername=\"([^\"]+)\"/",
         "sort": 1,
         "type": "query"
       }
@@ -1265,6 +1277,5 @@
   "timezone": "",
   "title": "Simplified Host Dashboard",
   "uid": "all-in-one-host-dashboard",
-  "version": 1,
-  "weekStart": ""
+  "version": 12
 }

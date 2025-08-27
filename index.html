@@ -18,19 +18,23 @@
             padding: 20px;
             background-color: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         h1 {
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 15px;
             margin-top: 0;
+            font-size: 24px;
         }
         .controls {
             margin-bottom: 20px;
             display: flex;
-            gap: 15px;
+            gap: 20px;
             align-items: center;
             flex-wrap: wrap;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
         }
         .control-group {
             display: flex;
@@ -38,26 +42,32 @@
             align-items: center;
         }
         .controls label {
-            font-weight: bold;
-        }
-        .controls button {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 4px;
-            background-color: #007bff;
-            color: white;
+            font-weight: 600;
             font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.2s;
         }
-        .controls button:hover {
-            background-color: #0056b3;
+        .iframe-container {
+            position: relative;
         }
         iframe {
             width: 100%;
-            height: 800px; /* Default height, can be adjusted */
+            height: 800px; /* Default height */
             border: 1px solid #ddd;
             border-radius: 4px;
+            display: block; /* Removes bottom space */
+        }
+        #resize-handle {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            cursor: ns-resize;
+            border-radius: 0 0 4px 4px;
+        }
+        #resize-handle:hover {
+            background-color: #007bff;
+        }
+        .second-iframe {
+            margin-top: 20px;
+            height: 200px; /* Fixed height for the smaller iframe */
         }
     </style>
 </head>
@@ -77,32 +87,69 @@
             </div>
         </div>
 
-        <!-- The iFrame where the Grafana dashboard will be displayed -->
-        <iframe 
-          id="grafana-dashboard-iframe"
-          src="http://192.168.5.100:3000/d/all-in-one-host-dashboard11/simplified-host-dashboardv11?orgId=1&refresh=10s&theme=dark&kiosk"
-          frameborder="0">
-        </iframe>
+        <!-- The resizable iFrame container -->
+        <div class="iframe-container">
+            <iframe 
+              id="grafana-dashboard-iframe"
+              src="http://192.168.5.100:3000/d/all-in-one-host-dashboard13/simplified-host-dashboard-v13?orgId=1&from=now-5m&to=now&timezone=browser&var-host=dragonfly%20%28192.168.2.24%29&refresh=10s&kiosk"
+              frameborder="0">
+            </iframe>
+            <div id="resize-handle"></div>
+        </div>
+
+       <iframe id="grafana-panel-iframe" class="second-iframe" src="http://192.168.5.100:3000/d-solo/host-summary-overview4/infrastructure-host-summary-dashboard-v4?orgId=1&from=1756280025235&to=1756280325235&timezone=browser&var-Filters=&refresh=30s&theme=dark&panelId=100&__feature.dashboardSceneSolo=true" width="450" height="200" frameborder="0"></iframe>
     </div>
 
     <script>
-        // This JavaScript function updates the iFrame's theme.
+        // --- Theme Update Logic ---
         function updateDashboardTheme() {
-            // 1. Get the selected theme.
             const selectedTheme = document.querySelector('input[name="theme"]:checked').value;
-
-            // 2. Get the iFrame element.
-            const iframe = document.getElementById('grafana-dashboard-iframe');
             
-            // 3. Get the current URL from the iFrame.
-            const currentUrl = new URL(iframe.src);
+            // Update the main dashboard iframe
+            const mainIframe = document.getElementById('grafana-dashboard-iframe');
+            const mainUrl = new URL(mainIframe.src);
+            mainUrl.searchParams.set('theme', selectedTheme);
+            
+            let mainUrlString = mainUrl.toString().replace('kiosk=&', 'kiosk&');
+            if (mainUrlString.endsWith('kiosk=')) {
+                mainUrlString = mainUrlString.slice(0, -1);
+            }
+            console.log("Updating main dashboard theme to:", selectedTheme);
+            mainIframe.src = mainUrlString;
 
-            // 4. Update the 'theme' parameter in the URL.
-            currentUrl.searchParams.set('theme', selectedTheme);
+            // Update the second panel iframe
+            const panelIframe = document.getElementById('grafana-panel-iframe');
+            const panelUrl = new URL(panelIframe.src);
+            panelUrl.searchParams.set('theme', selectedTheme);
+            console.log("Updating panel theme to:", selectedTheme);
+            panelIframe.src = panelUrl.toString();
+        }
 
-            // 5. Update the iFrame's 'src' attribute to reload it with the new theme.
-            console.log("Updating dashboard theme to:", selectedTheme);
-            iframe.src = currentUrl.toString();
+        // --- iFrame Resizing Logic ---
+        const resizeHandle = document.getElementById('resize-handle');
+        const iframe = document.getElementById('grafana-dashboard-iframe');
+        let isResizing = false;
+
+        resizeHandle.addEventListener('mousedown', function(e) {
+            isResizing = true;
+            document.body.style.userSelect = 'none'; 
+            document.body.style.pointerEvents = 'none';
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', stopResize);
+        });
+
+        function handleMouseMove(e) {
+            if (!isResizing) return;
+            const newHeight = e.clientY - iframe.getBoundingClientRect().top;
+            iframe.style.height = newHeight + 'px';
+        }
+
+        function stopResize() {
+            isResizing = false;
+            document.body.style.userSelect = '';
+            document.body.style.pointerEvents = '';
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', stopResize);
         }
     </script>
 
