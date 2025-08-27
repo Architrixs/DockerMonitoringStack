@@ -1,24 +1,27 @@
 # Docker Microservices Monitoring Stack
 
-A complete, production-ready monitoring solution for Docker-based systems. This stack uses Prometheus, Grafana, cAdvisor, Node Exporter, and AlertManager to provide deep insights into your container and host performance without modifying your application code.
+A complete, production-ready monitoring solution for Docker-based systems. This stack uses Prometheus, Grafana, cAdvisor, Node Exporter, AlertManager, and Portainer to provide deep insights into your container and host performance without modifying your application code.
 
 ## ✨ Features
 
 -   **Zero Code Changes**: Monitors containers and hosts externally.
--   **Docker Compose**: Single-command setup and management.
--   **Grafana Dashboards**: Pre-configured dashboards for immediate visibility.
--   **Prometheus & AlertManager**: Powerful metrics and alerting engine.
--   **cAdvisor**: Detailed per-container metrics (CPU, Memory, Network, I/O).
--   **Node Exporter**: Detailed host metrics (CPU, Memory, Disk, System Load).
--   **Extensible**: Easily add remote hosts or other exporters.
+-   **Docker Compose**: Single-command setup for both the main stack and remote nodes.
+-   **Automated Service Discovery**: Automatically discovers, verifies, and adds new remote nodes for monitoring.
+-   **Centralized Multi-Node Management**: Use **Portainer** to manage all your local and remote Docker environments from a single, user-friendly GUI.
+-   **Grafana Dashboards**: Pre-configured and custom-built dashboards for immediate visibility into host, container, and fleet-wide metrics.
+-   **Precise & Robust Alerting**: A powerful set of refined alert rules for critical issues, with clean, readable notifications powered by custom templates.
+-   **Secure by Default**: Manages secrets like passwords and API keys securely using an environment file, which is kept out of version control.
+-   **Extensible**: Easily add new remote hosts by running a simple discovery script.
 
 ## ✅ System Requirements
 
 -   **Docker**: Version 20.10+
 -   **Docker Compose**: Version 1.29+ (or Docker Engine with compose plugin)
--   **Operating System**: Windows, macOS, or Linux.
--   **RAM**: 4GB+ recommended for smooth operation.
--   **Git**: Required for cloning this repository.
+-   **Operating System**: Linux is recommended for the main node. Remote nodes can be Linux, macOS, or Windows.
+-   **Required Tools (on main node):** `git`, `nmap`, and `jq`.
+    -   On Debian/Ubuntu: `sudo apt-get install -y nmap jq`
+    -   On CentOS/Fedora: `sudo yum install -y nmap jq`
+-   **RAM**: 4GB+ recommended for the main monitoring node.
 -   **(Optional) NVIDIA GPUs**: Requires [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) for GPU monitoring.
 
 ## 🚀 Quickstart Installation
@@ -26,12 +29,25 @@ A complete, production-ready monitoring solution for Docker-based systems. This 
 1.  **Clone the Repository**
     ```sh
     git clone <repository_url>
-    cd DockerMomitoringStack
+    cd monitoring-stack
     ```
 
-2.  **Run the Setup Script**
+2.  **Configure Secrets**
+    Create a `.env` file in the root of the directory. This is where you will store all your secrets. **This file should never be committed to Git.**
+    ```
+    # .env file
 
-    Choose the script for your operating system. It will check prerequisites and launch the stack.
+    # For Email Alerts (using Gmail as an example)
+    SMTP_USERNAME=your-sender-email@gmail.com
+    SMTP_PASSWORD=YOUR_16_CHARACTER_APP_PASSWORD
+
+    # For Portainer API Integration
+    PORTAINER_URL=https://your-portainer-ip:9443
+    PORTAINER_API_KEY=ptr_your_portainer_api_key_here
+    ```
+
+3.  **Run the Setup Script**
+    Choose the script for your operating system. It will check prerequisites and launch the main stack.
 
     **For Linux or macOS:**
     ```sh
@@ -44,7 +60,7 @@ A complete, production-ready monitoring solution for Docker-based systems. This 
     ./setup.ps1
     ```
 
-3.  **Access Services**
+4.  **Access Services**
     The script will open Grafana automatically. You can access all services at the URLs below.
 
 ## 🛠️ Accessing Services
@@ -52,67 +68,44 @@ A complete, production-ready monitoring solution for Docker-based systems. This 
 | Service | URL | Credentials |
 | :--- | :--- |:---|
 | **Grafana** | `http://localhost:3000` | `admin` / `admin` |
-| **Prometheus** | `http://localhost:9091` | N/A |
+| **Prometheus** | `http://localhost:9090` | N/A |
 | **AlertManager** | `http://localhost:9093` | N/A |
-| **Portainer** | `https://localhost:9443` | Set up on first visit |
+| **Portainer (HTTPS)** | `https://localhost:9443` | Set up on first visit |
+| **Portainer (HTTP API)**| `http://localhost:9000` | Use API Key |
 | **cAdvisor** | `http://localhost:8080` | N/A |
 
-## ⚙️ Configuration
+## ⚙️ Multi-Node Monitoring & Management
 
-### Adding a Remote Docker Host to Monitor
+This stack is designed to be the central control plane for all your Docker hosts.
 
-To monitor a remote server (e.g., a VM at `192.168.1.101`):
+### Adding a Remote Docker Host
 
-1.  **On the remote server**, install and run Node Exporter:
+1.  **On the remote server**, copy the `docker-compose.remote.yml` file.
+2.  Run `docker-compose -f docker-compose.remote.yml up -d`. This will start the necessary exporters (`node-exporter`, `cadvisor`, etc.).
+3.  Ensure the firewall on the remote host allows incoming traffic on the exporter ports (e.g., 9100, 8080) from your main monitoring server.
+4.  **On your main monitoring node**, run the discovery script:
     ```sh
-    docker run -d --name=node-exporter --net="host" --pid="host" -v "/:/host:ro,rslave" prom/node-exporter:v1.8.1
+    # You can specify subnets or let it auto-discover the local one.
+    ./discover-nodes.sh 192.168.5.0/24
     ```
-    *Ensure the firewall on the remote host allows incoming traffic on port `9100` from your monitoring server.*
+    The script will automatically find the new node, add it to Prometheus's targets, and register it as a new environment in Portainer.
 
-2.  **On your local machine**, edit `prometheus/prometheus.yml`:
-    ```yaml
-    # In scrape_configs:
-    - job_name: 'node-exporter'
-      static_configs:
-        - targets: ['localhost:9100']
-        # Uncomment and edit the following line:
-        - targets: ['192.168.1.101:9100']
-    ```
+### Portainer Multi-Node Management
+The discovery script automatically adds new hosts to Portainer as **Agent** environments. This allows you to manage all your remote Docker instances from the central Portainer UI without needing to manually configure certificates. Simply log in to Portainer and switch between your different environments from the home page.
 
-3.  **Restart Prometheus** to apply the changes:
-    ```sh
-    docker-compose restart prometheus
-    ```
+## 📊 Embedding Dashboards in Your Application
 
-### Enabling NVIDIA GPU Monitoring
+You can embed any Grafana dashboard into your own web application using an iFrame.
 
-1.  Ensure you have the **NVIDIA Container Toolkit** installed on your Docker host.
-2.  Uncomment the `dcgm-exporter` service in `docker-compose.yml`.
-3.  Uncomment the `dcgm-exporter` job in `prometheus/prometheus.yml`.
-4.  Restart the stack: `docker-compose up -d`.
+1.  **Enable Embedding:** The `docker-compose.yml` file is already configured with the necessary environment variables (`GF_SECURITY_ALLOW_EMBEDDING=true`, etc.) to allow this.
+2.  **Get the Embed URL:** In Grafana, go to the dashboard you want to embed, click the "Share" icon, and go to the "Embed" tab.
+3.  **Use Kiosk Mode:** For a clean, UI-less view, add `&kiosk=tv` to the end of the URL. This mode is locked and cannot be exited with the `Esc` key.
+4.  **Control Dynamically:** You can change dashboard variables like the theme or the selected host directly from your application by updating the iFrame's `src` URL with JavaScript.
 
-### Customizing Alerts
-
-1.  **Add Rules**: Edit `alertmanager/alert.rules.yml` to add or modify alerting rules. Use the [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) for syntax.
-2.  **Configure Notifiers**: Edit `alertmanager/alertmanager.yml` to configure receivers like Slack, PagerDuty, or email. See the [AlertManager documentation](https://prometheus.io/docs/alerting/latest/configuration/) for examples.
-3.  Restart the relevant services: `docker-compose restart prometheus alertmanager`.
-
-## 🔍 Sample PromQL Queries
-
-Use these in the Grafana "Explore" tab or the Prometheus UI to query your data.
-
--   **Top 5 containers by memory usage:**
-    `topk(5, sum(container_memory_usage_bytes) by (name))`
-
--   **CPU usage per container (as a percentage of one core):**
-    `sum(rate(container_cpu_usage_seconds_total[5m])) by (name) * 100`
-
--   **Network I/O received by containers:**
-    `sum(rate(container_network_receive_bytes_total[5m])) by (name)`
-
-## 💣 Stopping the Stack
-
-To stop and remove all containers:
-```sh
-docker-compose down
+**Example iFrame:**
+```html
+<iframe src="http://localhost:3000/d/your-dashboard-id/your-dashboard?orgId=1&kiosk=tv&theme=dark&var-host=192.168.1.101" width="100%" height="800"></iframe>
 ```
+## 💣 Stopping the Stack
+To stop and remove all containers: `docker-compose down`
+To also remove the persistent data volumes (Prometheus history, Grafana settings): `docker-compose down -v`

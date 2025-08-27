@@ -36,16 +36,18 @@ receivers:
   # A blackhole receiver that does nothing. Used as a safe default.
   - name: 'blackhole'
 
-  - name: 'email-notifications'
-    email_configs:
-      - to: 'your-recipient-email@example.com'
-        headers:
-          subject: '[{{ .Status | toUpper }}] {{ .CommonAnnotations.summary }}'
-        html: '{{ template "custom_email.html" . }}'
-        send_resolved: true
+  # Uncomment to enable email notifications
+  # - name: 'email-notifications'
+  #   email_configs:
+  #     - to: 'your-recipient-email@example.com'
+  #       headers:
+  #         subject: '[{{ .Status | toUpper }}] {{ .CommonAnnotations.summary }}'
+  #       html: '{{ template "custom_email.html" . }}'
+  #       send_resolved: true
 
+  # Uncomment to enable webhook notifications
   # --- Webhook Receiver ---
-  - name: 'app-api-webhook'
-    webhook_configs:
-      - url: 'https://your-api-endpoint/alert'
-        send_resolved: true
+  # - name: 'app-api-webhook'
+  #   webhook_configs:
+  #     - url: 'https://your-api-endpoint/alert'
+  #       send_resolved: true
