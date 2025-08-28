@@ -32,7 +32,7 @@ services:
 
   # Grafana - The visualization dashboard
   grafana:
-    image: grafana/grafana:11.1.0
+    image: grafana/grafana:12.1
     container_name: grafana
     restart: unless-stopped
     volumes:
@@ -64,19 +64,6 @@ services:
       - /dev/kmsg
     ports:
       - "8080:8080"
-    networks:
-      - monitoring-net
-
-  docker-state-exporter:
-    image: karugaru/docker_state_exporter:latest
-    container_name: docker-state-exporter
-    restart: unless-stopped
-    ports:
-      - "8081:8080"  # Change port if 8080 is already used
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
     networks:
       - monitoring-net
 
@@ -120,7 +107,7 @@ services:
 
   # Portainer - GUI for Docker management
   portainer:
-    image: portainer/portainer-ce:2.20.1
+    image: portainer/portainer-ce:2.33.0-alpine
     container_name: portainer
     restart: unless-stopped
     volumes:
