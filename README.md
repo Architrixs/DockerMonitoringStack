@@ -42,7 +42,6 @@ A complete, production-ready monitoring solution for Docker-based systems. This 
     SMTP_PASSWORD=YOUR_16_CHARACTER_APP_PASSWORD
 
     # For Portainer API Integration
-    PORTAINER_URL=https://your-portainer-ip:9443
     PORTAINER_API_KEY=ptr_your_portainer_api_key_here
     ```
 
