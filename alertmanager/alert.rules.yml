@@ -63,27 +63,6 @@ groups:
           summary: "High memory on container {{ $labels.name }} on host {{ $labels.hostname }}"
           description: "Container '{{ $labels.name }}' on host '{{ $labels.hostname }}' is using more than 4GB of RAM. Current usage: {{ $value | humanize1024 }}B."
 
-      # - alert: ContainerRestarting
-      #   # This alert is more precise, firing if a container restarts more than twice in 15 minutes.
-      #   expr: rate(container_restarts_total{name!=""}[15m]) * 60 * 15 > 2
-      #   for: 1m
-      #   labels:
-      #     severity: 'critical'
-      #   annotations:
-      #     summary: "Container {{ $labels.name }} is in a crash loop"
-      #     description: "Container '{{ $labels.name }}' has restarted more than twice in the last 15 minutes."
-
-      # - alert: ContainerCrashLooping
-      #   # This alert detects a container that is stuck in a restart loop by counting scrape failures.
-      #   # It fires if scrapes for a container have failed more than 3 times in the last 15 minutes.
-      #   expr: count_over_time(up{job="cadvisor", name!="", name!~"prometheus|grafana|cadvisor|alertmanager|node-exporter|portainer|dcgm-exporter"}[15m] == 0) > 3
-      #   for: 1m
-      #   labels:
-      #     severity: 'critical'
-      #   annotations:
-      #     summary: "Container {{ $labels.name }} on host {{ $labels.hostname }} is crash-looping"
-      #     description: "Container '{{ $labels.name }}' on host '{{ $labels.hostname }}' is unstable and failing to respond to monitoring scrapes. It has failed more than 3 scrapes in the last 15 minutes."
-
       - alert: ContainerKilled
         # This is a long-term fallback if a container disappears for 15 minutes.
         expr: time() - container_last_seen{name!="", name!~"prometheus|grafana|cadvisor|alertmanager|node-exporter|portainer|dcgm-exporter"} > 900
@@ -93,3 +72,37 @@ groups:
         annotations:
           summary: "App container {{ $labels.name }} on host {{ $labels.hostname }} has disappeared"
           description: "The application container '{{ $labels.name }}' on host '{{ $labels.hostname }}' has been missing for over 15 minutes. It may have crashed or been removed."
+
+  - name: gpu_alerts
+    rules:
+      - alert: GpuHighTempWarning
+        # This expression triggers if a specific GPU's temperature is above 80°C for 5 minutes.
+        # It groups by 'instance' (the host) and 'gpu' (the specific card).
+        expr: avg by (instance, gpu) (DCGM_FI_DEV_GPU_TEMP) > 36
+        for: 5m
+        labels:
+          severity: 'warning'
+        annotations:
+          summary: "GPU high temperature warning on {{ $labels.instance }}"
+          description: "GPU {{ $labels.gpu }} on host {{ $labels.instance }} has a temperature over 80°C. Current value: {{ $value | printf \"%.2f\" }}°C."
+
+      - alert: GpuHighTempCritical
+        # This expression triggers if a specific GPU's temperature is critically high (above 90°C).
+        expr: avg by (instance, gpu) (DCGM_FI_DEV_GPU_TEMP) > 39
+        for: 5m
+        labels:
+          severity: 'critical'
+        annotations:
+          summary: "GPU critical temperature on {{ $labels.instance }}"
+          description: "GPU {{ $labels.gpu }} on host {{ $labels.instance }} has a critical temperature over 90°C. Current value: {{ $value | printf \"%.2f\" }}°C. Immediate action may be required."
+
+      - alert: GpuSustainedHighUtilisation
+        # This triggers if a GPU's utilization is over 90% for a sustained period of 15 minutes.
+        # This can help identify workloads that may be stuck or unexpectedly consuming resources.
+        expr: avg by (instance, gpu) (DCGM_FI_DEV_GPU_UTIL) > 90
+        for: 15m
+        labels:
+          severity: 'warning'
+        annotations:
+          summary: "GPU sustained high utilisation on {{ $labels.instance }}"
+          description: "GPU {{ $labels.gpu }} on host {{ $labels.instance }} has had utilisation above 90% for 15 minutes. Current value: {{ $value | printf \"%.2f\" }}%."
