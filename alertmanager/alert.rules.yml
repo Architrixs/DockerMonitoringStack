@@ -75,34 +75,23 @@ groups:
 
   - name: gpu_alerts
     rules:
-      - alert: GpuHighTempWarning
-        # This expression triggers if a specific GPU's temperature is above 80°C for 5 minutes.
-        # It groups by 'instance' (the host) and 'gpu' (the specific card).
-        expr: avg by (instance, gpu) (DCGM_FI_DEV_GPU_TEMP) > 36
-        for: 5m
-        labels:
-          severity: 'warning'
-        annotations:
-          summary: "GPU high temperature warning on {{ $labels.instance }}"
-          description: "GPU {{ $labels.gpu }} on host {{ $labels.instance }} has a temperature over 80°C. Current value: {{ $value | printf \"%.2f\" }}°C."
-
-      - alert: GpuHighTempCritical
-        # This expression triggers if a specific GPU's temperature is critically high (above 90°C).
-        expr: avg by (instance, gpu) (DCGM_FI_DEV_GPU_TEMP) > 39
+      - alert: High_GPU_Temp
+        # This expression triggers if a specific GPU's temperature is critically high (above 70°C).
+        expr: avg by (servername, gpu, hostname) (DCGM_FI_DEV_GPU_TEMP) > 70
         for: 5m
         labels:
           severity: 'critical'
         annotations:
-          summary: "GPU critical temperature on {{ $labels.instance }}"
-          description: "GPU {{ $labels.gpu }} on host {{ $labels.instance }} has a critical temperature over 90°C. Current value: {{ $value | printf \"%.2f\" }}°C. Immediate action may be required."
+          summary: "GPU critical temperature on {{ $labels.servername }}"
+          description: "GPU {{ $labels.gpu }} on host {{ $labels.servername }} has a critical temperature over 70°C. Current value: {{ $value | printf \"%.2f\" }}°C. Immediate action may be required."
 
       - alert: GpuSustainedHighUtilisation
         # This triggers if a GPU's utilization is over 90% for a sustained period of 15 minutes.
         # This can help identify workloads that may be stuck or unexpectedly consuming resources.
-        expr: avg by (instance, gpu) (DCGM_FI_DEV_GPU_UTIL) > 90
+        expr: avg by (servername, gpu, hostname) (DCGM_FI_DEV_GPU_UTIL) > 90
         for: 15m
         labels:
           severity: 'warning'
         annotations:
-          summary: "GPU sustained high utilisation on {{ $labels.instance }}"
-          description: "GPU {{ $labels.gpu }} on host {{ $labels.instance }} has had utilisation above 90% for 15 minutes. Current value: {{ $value | printf \"%.2f\" }}%."
+          summary: "GPU sustained high utilisation on {{ $labels.servername }}"
+          description: "GPU {{ $labels.gpu }} on host {{ $labels.servername }} has had utilisation above 90% for 15 minutes. Current value: {{ $value | printf \"%.2f\" }}%."

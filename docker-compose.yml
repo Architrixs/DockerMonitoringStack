@@ -91,7 +91,7 @@ services:
 
   # AlertManager - Handles alerts from Prometheus
   alertmanager:
-    image: prom/alertmanager:v0.27.0
+    image: prom/alertmanager:v0.28.1
     container_name: alertmanager
     restart: unless-stopped
     environment:
